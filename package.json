@@ -14,9 +14,12 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@vue/composition-api": "^1.0.0-beta.1",
+    "@xstate/vue": "^0.2.0",
     "sweetalert": "^2.1.2",
     "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "xstate": "^4.11.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
