@@ -65,7 +65,6 @@ export default {
   },
   mounted() {
     this.send('fetch')
-    console.log('state machine', this.current.value, this.current.actions)
     this.checkListItemsStatus()
   },
   methods: {
@@ -77,7 +76,7 @@ export default {
       }
     },
     createTodo(newTodo) {
-      this.send('fillDetails', newTodo)
+      this.send('fillDetails')
       this.current.context.todoList.push(newTodo)
       sweetalert('Success!', 'To-Do created!', 'success')
     },

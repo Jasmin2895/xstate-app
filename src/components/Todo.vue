@@ -3,6 +3,8 @@
     <div class="content" v-show="!isEditing">
       <div class="header">
         {{ todo.title }}
+        <div class="tag active" v-if="todo.new">New Task</div>
+        <div class="tag" v-else>Old Task</div>
       </div>
       <div class="meta">
         {{ todo.project }}
@@ -58,6 +60,9 @@ export default {
       isEditing: false
     }
   },
+  mounted() {
+    console.log('todo', this.todo)
+  },
   methods: {
     completeTodo(todo) {
       this.$emit('complete-todo', todo)
@@ -75,3 +80,20 @@ export default {
   }
 }
 </script>
+<style scoped>
+.header {
+  display: flex !important;
+  justify-content: space-between;
+}
+.tag {
+  font-size: 12px;
+  border: 2px solid gainsboro;
+  border-radius: 20px;
+  color: gainsboro;
+  padding: 2px 8px;
+}
+.active {
+  color: green;
+  border: 2px solid green;
+}
+</style>

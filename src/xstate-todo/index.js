@@ -109,13 +109,10 @@ export const todoMachine = Machine(
   {
     actions: {
       createNewTodoItem: (context, event) => {
-        console.log('context createnew todo Item, this method called', context)
+        console.log('create new todo item', context)
       },
       addListItem: (context, event) => {
-        console.log('fetch list item', context, event)
-      },
-      testFunction: (context, event) => {
-        console.log('context event', context, event)
+        console.log('add list item', context, event)
       }
     },
     delays: {
