@@ -9,7 +9,11 @@ const todoStore = new Vuex.Store({
   mutations: {
     increment(state, payload) {
       return (state.count = state.count + payload.amount)
-    }
+    },
+    update() {},
+    add() {},
+    delete() {},
+    edit() {}
   },
   actions: {
     updateList(context, payload) {
