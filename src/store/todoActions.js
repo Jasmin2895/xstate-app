@@ -3,23 +3,21 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const todoStore = new Vuex.Store({
-    state: {
-      todoList: [],
-    },
-    mutations: {
-      increment (state, payload){
-        return state.count = state.count + payload.amount;
-      }
-    },
-    actions: {
-    updateList= (context, payload)=> {
-        context.commit('increment', payload)
-    },
-    addTodoItem= () =>{
-
-    },
-    deleteTodoItem=()=> {
-
+  state: {
+    todoList: []
+  },
+  mutations: {
+    increment(state, payload) {
+      return (state.count = state.count + payload.amount)
     }
-  })
-  export default todoStore;
+  },
+  actions: {
+    updateList(context, payload) {
+      context.commit('increment', payload)
+    },
+    addTodoItem() {},
+    deleteTodoItem() {},
+    editTodoItem() {}
+  }
+})
+export default todoStore
