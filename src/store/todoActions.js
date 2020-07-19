@@ -7,18 +7,13 @@ const todoStore = new Vuex.Store({
     todoList: []
   },
   mutations: {
-    increment(state, payload) {
-      return (state.count = state.count + payload.amount)
-    },
-    update() {},
-    add() {},
-    delete() {},
-    edit() {}
+    update(state, payload) {},
+    add(state, payload) {},
+    delete(state, payload) {},
+    edit(state, payload) {}
   },
   actions: {
-    updateList(context, payload) {
-      context.commit('increment', payload)
-    },
+    updateList(context, payload) {},
     addTodoItem() {},
     deleteTodoItem() {},
     editTodoItem() {}
