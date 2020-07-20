@@ -25,7 +25,6 @@ export default {
   created() {
     this.toggleService
       .onTransition((state) => {
-        console.log('state', state, state.context)
         this.current = state
       })
       .start()
@@ -76,11 +75,15 @@ export default {
       }
     },
     createTodo(newTodo) {
-      this.send('fillDetails')
-      this.current.context.todoList.push(newTodo)
+      this.send({ type: 'fillDetails', payload: newTodo })
+      // this.send('listItems')
+      // this.current.context.currentItem = newTodo
+      // console.log('currentItem')
+      // this.current.context.todoList.push(newTodo)
       sweetalert('Success!', 'To-Do created!', 'success')
     },
     send(event) {
+      console.log('send event', event)
       this.toggleService.send(event)
     }
   }

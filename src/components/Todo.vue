@@ -60,15 +60,12 @@ export default {
       isEditing: false
     }
   },
-  mounted() {
-    console.log('todo', this.todo)
-  },
+  mounted() {},
   methods: {
     completeTodo(todo) {
       this.$emit('complete-todo', todo)
     },
     deleteTodo(todo) {
-      console.log('todo', todo)
       this.$emit('delete-todo', todo)
     },
     showForm() {

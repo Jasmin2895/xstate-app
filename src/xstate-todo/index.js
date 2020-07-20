@@ -1,5 +1,5 @@
 import { Machine, actions } from 'xstate'
-const { send } = actions
+const { send, assign } = actions
 
 export const todoMachine = Machine(
   {
@@ -23,6 +23,7 @@ export const todoMachine = Machine(
         invoke: {
           id: 'fetchList',
           src: (context, event) => {
+            console.log('fetchList', context, event)
             return context.todoList
           },
           onDone: {
@@ -34,7 +35,6 @@ export const todoMachine = Machine(
           listItems: {
             target: 'todoItemActions',
             actions: 'addListItem'
-            //   actions: ['fetchListItems']
           }
         }
       },
@@ -52,54 +52,31 @@ export const todoMachine = Machine(
           createTodoItem: {
             initial: 'add_details',
             states: {
-              idle: {
-                on: {
-                  create: 'add_details'
-                }
-              },
               add_details: {
                 on: {
-                  fillDetails: {
-                    target: 'createSuccess',
-                    actions: 'createNewTodoItem'
-                  }
+                  fillDetails: [{ actions: 'createNewTodoItem' }]
                 }
-              },
-              createSuccess: {}
+              }
             }
           },
           deleteTodoItem: {
-            initial: 'idle',
+            initial: 'deleteItem',
             states: {
-              idle: {
-                on: {
-                  select_item: 'deleteItem'
-                }
-              },
               deleteItem: {
                 on: {
-                  delete: 'deleteSuccess'
-                  //   actions: ['deleteItem']
+                  delete: [{ actions: 'deleteSuccess' }]
                 }
-              },
-              deleteSuccess: {}
+              }
             }
           },
           editTodoItem: {
-            initial: 'idle',
+            initial: 'edit_details',
             states: {
-              idle: {
-                on: {
-                  edit: 'edit_details'
-                }
-              },
               edit_details: {
                 on: {
-                  fill_details: 'editSuccess'
-                  //   actions: ['editTodoItem']
+                  fill_details: [{ actions: 'editSuccess' }]
                 }
-              },
-              editSuccess: {}
+              }
             }
           }
         }
@@ -108,12 +85,11 @@ export const todoMachine = Machine(
   },
   {
     actions: {
-      createNewTodoItem: (context, event) => {
-        console.log('create new todo item', context)
-      },
-      addListItem: (context, event) => {
-        console.log('add list item', context, event)
-      }
+      createNewTodoItem: assign((context, event) => {
+        console.log('create New Todo item', context, event)
+        context.todoList.push(event.payload)
+      }),
+      addListItem: (context, event) => {}
     },
     delays: {
       CONFIG_DELAY: (context) => context.delay
