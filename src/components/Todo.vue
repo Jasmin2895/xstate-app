@@ -56,23 +56,12 @@
 </template>
 
 <script type="text/javascript">
-import { todoMachine } from '../xstate-todo/index'
-import { interpret } from 'xstate'
 export default {
   props: ['todo'],
   data() {
     return {
-      isEditing: false,
-      toggleService: interpret(todoMachine)
+      isEditing: false
     }
-  },
-  created() {
-    console.log('currentstate', this.$store.state.currentState)
-    this.toggleService
-      .onTransition((state) => {
-        this.current = state
-      })
-      .start(this.$store.state.currentState)
   },
   methods: {
     completeTodo(todo) {
@@ -82,14 +71,10 @@ export default {
       this.$emit('delete-todo', todo)
     },
     showForm() {
-      console.log('showForm', this.current)
       this.isEditing = true
     },
     hideForm() {
       this.isEditing = false
-    },
-    send(event) {
-      this.toggleService.send(event)
     }
   }
 }

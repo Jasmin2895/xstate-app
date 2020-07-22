@@ -29,26 +29,16 @@
 <script type="text/javascript">
 import swal from 'sweetalert'
 import Todo from './Todo'
-import { todoMachine } from '../xstate-todo/index'
 
 export default {
   props: ['todos'],
   components: {
     Todo
   },
-  computed: {
-    currentState() {
-      return this.$store.state.currentState
-    }
-  },
-  mounted() {
-    console.log('machines', this.$store.state.currentState)
-  },
   methods: {
     deleteTodo(todo) {
-      console.log('delete todo', todo, todoMachine)
+      console.log('delete todo', todo)
       // todoMachine.send({ type: 'delete', payload: todo })
-      this.send('delete')
       swal({
         title: 'Are you sure?',
         text: 'Once deleted, you will not be able to recover this todo item!',
@@ -67,9 +57,6 @@ export default {
       const todoIndex = this.todos.indexOf(todo)
       this.todos[todoIndex].done = true
       swal('Success!', 'To-Do completed!', 'success')
-    },
-    send(event) {
-      this.toggleService.send(event)
     }
   }
 }
