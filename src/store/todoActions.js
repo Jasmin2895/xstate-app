@@ -1,12 +1,20 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { todoMachine } from '../xstate-todo/index'
 Vue.use(Vuex)
 
-const todoStore = new Vuex.Store({
+export const store = new Vuex.Store({
   state: {
-    todoList: []
+    currentState: todoMachine.initial
   },
   mutations: {
+    transitions(state, action) {
+      console.log('currentState of state machines', state, action)
+      // state.currentState = todoMachine.transition(
+      //   state.currentState,
+      //   action
+      // ).value
+    },
     update(state, payload) {},
     add(state, payload) {},
     delete(state, payload) {},
@@ -19,4 +27,3 @@ const todoStore = new Vuex.Store({
     editTodoItem() {}
   }
 })
-export default todoStore

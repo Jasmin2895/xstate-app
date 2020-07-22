@@ -1,5 +1,5 @@
 import { Machine, actions } from 'xstate'
-const { send, assign } = actions
+const { assign } = actions
 
 export const todoMachine = Machine(
   {
@@ -7,16 +7,34 @@ export const todoMachine = Machine(
     initial: 'idle',
     context: {
       user: null,
-      todoList: [],
+      todoList: [
+        {
+          title: 'Todo A',
+          project: 'Project A',
+          done: false
+        },
+        {
+          title: 'Todo B',
+          project: 'Project B',
+          done: true
+        },
+        {
+          title: 'Todo C',
+          project: 'Project C',
+          done: false
+        },
+        {
+          title: 'Todo D',
+          project: 'Project D',
+          done: false
+        }
+      ],
       delay: 0
     },
     states: {
       idle: {
         on: {
-          fetch: 'list',
-          entry: send('reset', {
-            delay: 'CONFIG_DELAY'
-          })
+          fetch: 'list'
         }
       },
       list: {
@@ -33,8 +51,7 @@ export const todoMachine = Machine(
         },
         on: {
           listItems: {
-            target: 'todoItemActions',
-            actions: 'addListItem'
+            target: 'todoItemActions'
           }
         }
       },
@@ -89,10 +106,12 @@ export const todoMachine = Machine(
         console.log('create New Todo item', context, event)
         context.todoList.push(event.payload)
       }),
-      addListItem: (context, event) => {}
-    },
-    delays: {
-      CONFIG_DELAY: (context) => context.delay
+      deleteTodoItem: assign((context, event) => {
+        console.log('deleteTodoItem action', context, event)
+      }),
+      testFunc: assign((context, event) => {
+        console.log('testFunc', context, event)
+      })
     }
   }
 )

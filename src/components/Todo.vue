@@ -13,7 +13,10 @@
         <span class="right floated edit icon" v-on:click="showForm">
           <i class="edit icon"></i>
         </span>
-        <span class="right floated trash icon" v-on:click="deleteTodo(todo)">
+        <span
+          class="right floated trash icon delete"
+          v-on:click="deleteTodo(todo)"
+        >
           <i class="trash icon"></i>
         </span>
       </div>
@@ -53,14 +56,24 @@
 </template>
 
 <script type="text/javascript">
+import { todoMachine } from '../xstate-todo/index'
+import { interpret } from 'xstate'
 export default {
   props: ['todo'],
   data() {
     return {
-      isEditing: false
+      isEditing: false,
+      toggleService: interpret(todoMachine)
     }
   },
-  mounted() {},
+  created() {
+    console.log('currentstate', this.$store.state.currentState)
+    this.toggleService
+      .onTransition((state) => {
+        this.current = state
+      })
+      .start(this.$store.state.currentState)
+  },
   methods: {
     completeTodo(todo) {
       this.$emit('complete-todo', todo)
@@ -69,10 +82,14 @@ export default {
       this.$emit('delete-todo', todo)
     },
     showForm() {
+      console.log('showForm', this.current)
       this.isEditing = true
     },
     hideForm() {
       this.isEditing = false
+    },
+    send(event) {
+      this.toggleService.send(event)
     }
   }
 }
@@ -92,5 +109,11 @@ export default {
 .active {
   color: green;
   border: 2px solid green;
+}
+.delete {
+  cursor: pointer;
+}
+.edit {
+  cursor: pointer;
 }
 </style>
