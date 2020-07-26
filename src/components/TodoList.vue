@@ -29,11 +29,22 @@
 <script type="text/javascript">
 import swal from 'sweetalert'
 import Todo from './Todo'
-
+import { todoMachine } from '../xstate-todo/index'
+import { useMachine } from '@xstate/vue'
 export default {
   props: ['todos'],
   components: {
     Todo
+  },
+  setup(props) {
+    console.log('setup TodoList')
+    const { state, send } = useMachine(todoMachine)
+    console.log('state, send', state, send)
+
+    return {
+      state,
+      send
+    }
   },
   methods: {
     deleteTodo(todo) {

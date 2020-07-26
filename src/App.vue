@@ -16,6 +16,8 @@ import TodoList from './components/TodoList'
 import CreateTodo from './components/CreateTodo'
 import { todoMachine } from './xstate-todo/index'
 import { useMachine } from '@xstate/vue'
+import { onMounted } from '@vue/composition-api'
+
 export default {
   name: 'app',
   components: {
@@ -23,57 +25,35 @@ export default {
     CreateTodo
   },
   setup() {
-    const { state, send } = useMachine(todoMachine)
+    let { state, send } = useMachine(todoMachine)
+    let todoList = state.value.context.todoList
+
+    onMounted(() => {
+      send('fetch')
+      updateTodoItemList()
+    })
+
+    function updateTodoItemList() {
+      let currentState = state.value
+      if (
+        currentState.value === 'list' &&
+        currentState.context.todoList.length > 0
+      ) {
+        send('listItems')
+        console.log(state.value.value)
+      }
+      console.log('currentState2', currentState.value, state.value.value)
+    }
+    function createTodo(newTodo) {
+      state.value.context.todoList.push(newTodo) // add data to context todoList
+      sweetalert('Success!', 'To-Do created!', 'success')
+    }
+
     return {
       state,
-      send
-    }
-  },
-  data() {
-    return {
-      todoList: [
-        {
-          title: 'Todo A',
-          project: 'Project A',
-          done: false
-        },
-        {
-          title: 'Todo B',
-          project: 'Project B',
-          done: true
-        },
-        {
-          title: 'Todo C',
-          project: 'Project C',
-          done: false
-        },
-        {
-          title: 'Todo D',
-          project: 'Project D',
-          done: false
-        }
-      ]
-    }
-  },
-  mounted() {
-    // this.send('fetch')
-    // this.checkListItemsStatus()
-  },
-  methods: {
-    checkListItemsStatus() {
-      // if (this.current.value === 'list') {
-      //   if (this.current.context.todoList.length > -1) {
-      //     // this.send('listItems')
-      //   }
-      // }
-    },
-    createTodo(newTodo) {
-      // this.send({ type: 'fillDetails', payload: newTodo })
-      // this.send('listItems')
-      // this.current.context.currentItem = newTodo
-      // console.log('currentItem')
-      // this.current.context.todoList.push(newTodo)
-      sweetalert('Success!', 'To-Do created!', 'success')
+      send,
+      todoList,
+      createTodo
     }
   }
 }
