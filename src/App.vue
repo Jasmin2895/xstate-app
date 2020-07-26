@@ -16,7 +16,8 @@ import TodoList from './components/TodoList'
 import CreateTodo from './components/CreateTodo'
 import { todoMachine } from './xstate-todo/index'
 import { useMachine } from '@xstate/vue'
-import { onMounted } from '@vue/composition-api'
+import { onMounted, reactive } from '@vue/composition-api'
+import { store } from './store/todoActions'
 
 export default {
   name: 'app',
@@ -24,7 +25,11 @@ export default {
     TodoList,
     CreateTodo
   },
-  setup() {
+  setup(props, context) {
+    console.log('context and store', context, store)
+    const todoActionStore = reactive({
+      store
+    })
     let { state, send } = useMachine(todoMachine)
     let todoList = state.value.context.todoList
 
@@ -53,7 +58,8 @@ export default {
       state,
       send,
       todoList,
-      createTodo
+      createTodo,
+      ...todoActionStore
     }
   }
 }
