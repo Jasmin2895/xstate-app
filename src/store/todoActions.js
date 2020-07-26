@@ -9,7 +9,6 @@ export const store = new Vuex.Store({
   },
   mutations: {
     transitions(state, action) {
-      console.log('currentState of state machines', state, action)
       state.currentState = todoMachine.transition(
         state.currentState,
         action

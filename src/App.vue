@@ -26,7 +26,6 @@ export default {
     CreateTodo
   },
   setup(props, context) {
-    console.log('context and store', context, store)
     const todoActionStore = reactive({
       store
     })
@@ -35,6 +34,7 @@ export default {
 
     onMounted(() => {
       send('fetch')
+      store.commit('transitions', 'fetch')
       updateTodoItemList()
     })
 
@@ -45,9 +45,8 @@ export default {
         currentState.context.todoList.length > 0
       ) {
         send('listItems')
-        console.log(state.value.value)
+        store.commit('transitions', 'listItems')
       }
-      console.log('currentState2', currentState.value, state.value.value)
     }
     function createTodo(newTodo) {
       state.value.context.todoList.push(newTodo) // add data to context todoList
