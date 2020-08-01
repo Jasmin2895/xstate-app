@@ -1,10 +1,31 @@
-import { Machine, actions } from 'xstate'
+import { Machine, actions, spawn } from 'xstate'
 const { assign } = actions
+
+const todoItemMachine = Machine({
+  id: 'todoItem',
+  initial: 'addItem',
+  states: {
+    addItem: {}
+  }
+})
+
+// const todoItemMachine = (todo) => {
+//   return Machine({
+//     id: 'todoItem',
+//     context: {
+//       todo
+//     },
+//     initial: 'addItem',
+//     states: {
+//       addItem: {}
+//     }
+//   })
+// }
 
 export const todoMachine = Machine(
   {
     id: 'Todo',
-    initial: 'idle',
+    initial: 'list',
     context: {
       user: null,
       todoList: [
@@ -38,21 +59,9 @@ export const todoMachine = Machine(
         }
       },
       list: {
-        invoke: {
-          id: 'fetchList',
-          src: (context, event) => {
-            console.log('fetchList', context, event)
-            return context.todoList
-          },
-          onDone: {
-            target: 'resolved'
-          },
-          onError: 'rejected'
-        },
+        entry: 'fetchList',
         on: {
-          listItems: {
-            target: 'todoItemActions'
-          }
+          listItems: 'todoItemActions'
         }
       },
       resolved: {
@@ -102,9 +111,17 @@ export const todoMachine = Machine(
   },
   {
     actions: {
+      fetchList: assign({
+        todoList: (context, event) => {
+          return context.todoList.map((todo) => ({
+            ...todo,
+            ref: spawn(todoItemMachine.withContext(todo))
+          }))
+        }
+      }),
       createNewTodoItem: assign((context, event) => {
         console.log('create New Todo item', context, event)
-        context.todoList.push(event.payload)
+        // context.todoList.push(event.payload)
       }),
       deleteTodoItem: assign((context, event) => {
         console.log('deleteTodoItem action', context, event)

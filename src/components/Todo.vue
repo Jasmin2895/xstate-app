@@ -65,6 +65,7 @@ export default {
   },
   methods: {
     completeTodo(todo) {
+      console.log('complete todo', todo)
       this.$emit('complete-todo', todo)
     },
     deleteTodo(todo) {

@@ -29,25 +29,30 @@ export default {
     const todoActionStore = reactive({
       store
     })
-    let { state, send } = useMachine(todoMachine)
-    let todoList = state.value.context.todoList
+    let { state, send, service } = useMachine(todoMachine)
+    let { todoList } = state.value.context
+    console.log('app todolist', todoList)
 
     onMounted(() => {
-      send('fetch')
-      store.commit('transitions', 'fetch')
-      updateTodoItemList()
+      send('listItems')
+      store.commit('services', service)
+      store.commit('transitions', 'listItems')
+      console.log('state todo app', state.value)
+      // updateTodoItemList()
     })
 
-    function updateTodoItemList() {
-      let currentState = state.value
-      if (
-        currentState.value === 'list' &&
-        currentState.context.todoList.length > 0
-      ) {
-        send('listItems')
-        store.commit('transitions', 'listItems')
-      }
-    }
+    // function updateTodoItemList() {
+    //   let currentState = state.value
+    //   if (
+    //     currentState.value === 'list' &&
+    //     currentState.context.todoList.length > 0
+    //   ) {
+    //     // todoMachine.transition(todoMachine.initial.value, 'listItems')
+    //     send('listItems')
+    //     store.commit('services', service)
+    //     store.commit('transitions', 'listItems')
+    //   }
+    // }
     function createTodo(newTodo) {
       state.value.context.todoList.push(newTodo) // add data to context todoList
       sweetalert('Success!', 'To-Do created!', 'success')
@@ -56,6 +61,7 @@ export default {
     return {
       state,
       send,
+      service,
       todoList,
       createTodo,
       ...todoActionStore

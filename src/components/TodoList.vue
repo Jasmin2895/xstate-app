@@ -29,31 +29,25 @@
 <script type="text/javascript">
 import swal from 'sweetalert'
 import Todo from './Todo'
-import { todoMachine } from '../xstate-todo/index'
 import { useMachine } from '@xstate/vue'
-import { watch, ref } from '@vue/composition-api'
+import { store } from '../store/todoActions'
+import { reactive, computed } from '@vue/composition-api'
+import { todoMachine } from '../xstate-todo'
 export default {
   props: ['todos'],
   components: {
     Todo
   },
-  setup(props) {
-    // console.log('setup TodoList') const { state, send } = useMachine(todoMachine)
-    const { state, send } = useMachine(todoMachine)
-    let updatedState = ref({})
-    watch(() => {
-      updatedState = state
-      console.log('setup TodoList', updatedState)
+  setup(props, context) {
+    const todoActionStore = reactive({
+      store
     })
-    return {
-      state,
-      send
-    }
-  },
-  methods: {
-    deleteTodo(todo) {
-      console.log('delete todo', todo)
-      // todoMachine.send({ type: 'delete', payload: todo })
+    // const presentState = reactive({store.state.value})
+    // console.log('presentState', presentState)
+    const { state, send } = useMachine(todoMachine)
+    console.log('todolist app', store.state.currentState, state.value, send)
+
+    function deleteTodo(todo) {
       swal({
         title: 'Are you sure?',
         text: 'Once deleted, you will not be able to recover this todo item!',
@@ -61,18 +55,52 @@ export default {
         buttons: true,
         dangerMode: true
       }).then((todo) => {
-        let todoIndex = this.todos.indexOf(todo)
-        this.todos.splice(todoIndex, 1)
+        let todoIndex = props.todos.indexOf(todo)
+        props.todos.splice(todoIndex, 1)
+        send('deleteTodoItem')
+        send('deleteItem')
+        console.log('state deleteItem1', state)
+        store.commit('transitions', 'deleteItem')
         swal('Poof! Your imaginary file has been deleted!', {
           icon: 'success'
         })
       })
-    },
-    completeTodo(todo) {
-      const todoIndex = this.todos.indexOf(todo)
-      this.todos[todoIndex].done = true
+    }
+    function completeTodo(todo) {
+      const todoIndex = props.todos.indexOf(todo)
+      props.todos[todoIndex].done = true
+      // send('deleteItem')
       swal('Success!', 'To-Do completed!', 'success')
     }
+
+    // console.log('store, send', store, send)
+    return {
+      state,
+      send,
+      ...todoActionStore,
+      deleteTodo,
+      completeTodo
+    }
+    // const
+    // onMounted(() => {
+    //   console.log('on mounted')
+    //   const { state, send } = useMachine(todoMachine, {
+    //     state: store.state.value
+    //   })
+    // })
+    // function onMounted() {
+    //   const { state, send } = useMachine(todoMachine, {
+    //     state: store.state.value
+    //   })
+    // }
+
+    // const service = useStore(store.state.currentState)
+    // console.log('service', service)
+    // let updatedState = ref({})
+    // watch(() => {
+    //   updatedState = state
+    //   console.log('setup TodoList', updatedState)
+    // })
   }
 }
 </script>
