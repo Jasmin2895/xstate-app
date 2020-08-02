@@ -57,7 +57,6 @@
 
 <script type="text/javascript">
 import { useService } from '@xstate/vue'
-import { store } from '../store/todoActions'
 import { ref } from '@vue/composition-api'
 export default {
   props: ['todo'],

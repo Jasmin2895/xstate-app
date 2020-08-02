@@ -87,7 +87,7 @@ export const todoMachine = Machine(
             states: {
               deleteItem: {
                 on: {
-                  delete: [{ actions: 'deleteCurrentTodoItem' }]
+                  delete: { actions: ['deleteCurrentTodoItem', 'persist'] }
                 }
               }
             }
@@ -97,7 +97,7 @@ export const todoMachine = Machine(
             states: {
               edit_details: {
                 on: {
-                  fill_details: [{ actions: 'editCurrentTodoItem' }]
+                  editItem: [{ actions: 'editCurrentTodoItem' }]
                 }
               }
             }
@@ -121,16 +121,22 @@ export const todoMachine = Machine(
         todoList: (context, event) => {
           console.log('create New Todo item', context, event)
           let newTodo = createTodo(event.payload)
-          console.log('payload data check', ...newTodo)
-          return context.todoList.push({
+          return context.todoList.concat({
             ...newTodo,
             ref: spawn(todoItemMachine.withContext(newTodo))
           })
-          // console.log('context after value push', context)
         }
       }),
-      deleteCurrentTodoItem: assign((context, event) => {
-        console.log('deleteTodoItem action', context, event)
+
+      deleteCurrentTodoItem: assign({
+        todoList: (context, event) => {
+          console.log('delete item from list', context.todoList)
+          return context.todoList.filter((todo) => {
+            if (todo.title !== event.payload.title) {
+              return true
+            }
+          })
+        }
       }),
       editCurrentTodoItem: assign((context, event) => {
         console.log('testFunc', context, event)
