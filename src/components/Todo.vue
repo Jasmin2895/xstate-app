@@ -2,12 +2,12 @@
   <div class="ui centered card">
     <div class="content" v-show="!isEditing">
       <div class="header">
-        {{ todo.title }}
+        {{ todoItem.title }}
         <div class="tag active" v-if="todo.new">New Task</div>
         <div class="tag" v-else>Old Task</div>
       </div>
       <div class="meta">
-        {{ todo.project }}
+        {{ todoItem.project }}
       </div>
       <div class="extra content">
         <span class="right floated edit icon" v-on:click="showForm">
@@ -25,11 +25,11 @@
       <div class="ui form">
         <div class="field">
           <label>Title</label>
-          <input type="text" v-model="todo.title" />
+          <input type="text" v-model="todoItem.title" />
         </div>
         <div class="field">
           <label>Project</label>
-          <input type="text" v-model="todo.project" />
+          <input type="text" v-model="todoItem.project" />
         </div>
         <div class="ui two button attached buttons">
           <button class="ui basic blue button" v-on:click="hideForm">
@@ -57,16 +57,16 @@
 
 <script type="text/javascript">
 import { useService } from '@xstate/vue'
-import { ref } from '@vue/composition-api'
+import { ref, computed } from '@vue/composition-api'
 export default {
   props: ['todo'],
   setup(props, context) {
-    console.log('ref', props.todo)
+    let { state, send } = useService(props.todo.ref)
+
     let isEditing = ref(false)
-    const { state, send } = useService(props.todo.ref)
-    console.log('todo Item state', state)
 
     function completeTodo(todo) {
+      send('completeTask')
       this.$emit('complete-todo', todo)
     }
 
@@ -84,6 +84,7 @@ export default {
     return {
       state,
       send,
+      todoItem: computed(() => state.value.context),
       isEditing,
       completeTodo,
       deleteTodo,

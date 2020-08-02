@@ -37,7 +37,6 @@ export default {
   setup(props, { emit }) {
     function deleteTodo(todo) {
       let currentItem = todo
-      console.log('deleteTodo function', todo)
       swal({
         title: 'Are you sure?',
         text: 'Once deleted, you will not be able to recover this todo item!',
@@ -52,8 +51,7 @@ export default {
       })
     }
     function completeTodo(todo) {
-      const todoIndex = props.todos.indexOf(todo)
-      props.todos[todoIndex].done = true
+      emit('complete-todo', todo)
       swal('Success!', 'To-Do completed!', 'success')
     }
 

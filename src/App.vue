@@ -6,6 +6,7 @@
         <todo-list
           v-bind:todos="todoList"
           @delete-todo="deleteTodoItem"
+          @complete-todo="completeTodoItem"
         ></todo-list>
         <create-todo v-on:create-todo="createTodo"></create-todo>
       </div>
@@ -27,7 +28,6 @@ export default {
     CreateTodo
   },
   setup(props, context) {
-    console.log('stateMachineActions', stateMachineActions)
     let {
       state,
       stateTransitions,
@@ -46,6 +46,10 @@ export default {
       stateTransitions('delete', todoItem)
     }
 
+    function completeTodoItem(todoItem) {
+      setCurrentState('editTodoItem')
+      stateTransitions('editItem', todoItem)
+    }
     function createTodo(newTodo) {
       setCurrentState('createTodoItem')
       stateTransitions('fillDetails', newTodo)
@@ -57,7 +61,8 @@ export default {
       createTodo,
       todoActionStore,
       todoList,
-      deleteTodoItem
+      deleteTodoItem,
+      completeTodoItem
     }
   }
 }

@@ -5,9 +5,15 @@ const todoItemMachine = Machine({
   id: 'todoItem',
   initial: 'completed',
   states: {
-    todoListAcations: {},
-    completed: {},
+    completed: {
+      on: {
+        completeTask: { actions: 'completedTodoAction' }
+      }
+    },
     pending: {}
+  },
+  actions: {
+    completedTodoAction: assign((context, event) => {})
   }
 })
 
@@ -97,7 +103,7 @@ export const todoMachine = Machine(
             states: {
               edit_details: {
                 on: {
-                  editItem: [{ actions: 'editCurrentTodoItem' }]
+                  editItem: { actions: ['editCurrentTodoItem', 'persist'] }
                 }
               }
             }
@@ -110,7 +116,6 @@ export const todoMachine = Machine(
     actions: {
       fetchList: assign({
         todoList: (context, event) => {
-          console.log('todoList fetchlist', context)
           return context.todoList.map((todo) => ({
             ...todo,
             ref: spawn(todoItemMachine.withContext(todo))
@@ -119,7 +124,6 @@ export const todoMachine = Machine(
       }),
       createNewTodoItem: assign({
         todoList: (context, event) => {
-          console.log('create New Todo item', context, event)
           let newTodo = createTodo(event.payload)
           return context.todoList.concat({
             ...newTodo,
@@ -130,7 +134,6 @@ export const todoMachine = Machine(
 
       deleteCurrentTodoItem: assign({
         todoList: (context, event) => {
-          console.log('delete item from list', context.todoList)
           return context.todoList.filter((todo) => {
             if (todo.title !== event.payload.title) {
               return true
@@ -138,8 +141,12 @@ export const todoMachine = Machine(
           })
         }
       }),
-      editCurrentTodoItem: assign((context, event) => {
-        console.log('testFunc', context, event)
+      editCurrentTodoItem: assign({
+        todoList: (context, event) => {
+          let todoIndex = context.todoList.indexOf(event.payload)
+          context.todoList[todoIndex].done = true
+          return context.todoList
+        }
       })
     }
   }
