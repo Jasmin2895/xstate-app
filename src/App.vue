@@ -3,7 +3,7 @@
     <h1 class="ui dividing centered header">Vue.js Todo App</h1>
     <div class="ui three column centered grid">
       <div class="column">
-        <todo-list v-bind:todos="todoList"></todo-list>
+        <todo-list v-bind:todos="todoList2"></todo-list>
         <create-todo v-on:create-todo="createTodo"></create-todo>
       </div>
     </div>
@@ -16,7 +16,7 @@ import TodoList from './components/TodoList'
 import CreateTodo from './components/CreateTodo'
 import { todoMachine } from './xstate-todo/index'
 import { useMachine } from '@xstate/vue'
-import { onMounted, reactive } from '@vue/composition-api'
+import { onMounted, reactive, computed, ref } from '@vue/composition-api'
 import { store } from './store/todoActions'
 
 export default {
@@ -26,35 +26,42 @@ export default {
     CreateTodo
   },
   setup(props, context) {
-    const todoActionStore = reactive({
+    let { state, send, service } = useMachine(todoMachine)
+    console.log(
+      'app context',
+      state.value.context,
+      computed(() => state.value.context)
+    )
+
+    let todoList1 = ref([])
+
+    function updateTodoList() {
+      console.log('todoList1', state.value.context.todoList)
+      todoList1.value = state.value.context.todoList
+    }
+
+    console.log('todoList')
+    let { todoList } = state.value.context
+    let todoActionStore = reactive({
       store
     })
-    let { state, send, service } = useMachine(todoMachine)
-    let { todoList } = state.value.context
-    console.log('app todolist', todoList)
+
+    let todoList2 = computed(() => state.value.context.todoList).value
+    console.log('todoList2', todoList2)
 
     onMounted(() => {
-      send('listItems')
+      let currentState = state.value
       store.commit('services', service)
-      store.commit('transitions', 'listItems')
+      store.commit('setState', currentState.value)
       console.log('state todo app', state.value)
-      // updateTodoItemList()
+      updateTodoList()
     })
 
-    // function updateTodoItemList() {
-    //   let currentState = state.value
-    //   if (
-    //     currentState.value === 'list' &&
-    //     currentState.context.todoList.length > 0
-    //   ) {
-    //     // todoMachine.transition(todoMachine.initial.value, 'listItems')
-    //     send('listItems')
-    //     store.commit('services', service)
-    //     store.commit('transitions', 'listItems')
-    //   }
-    // }
     function createTodo(newTodo) {
-      state.value.context.todoList.push(newTodo) // add data to context todoList
+      // store.commit('transitions', 'fillDetails')
+      send({ type: 'fillDetails', payload: newTodo })
+      console.log('newTodo craeteTodo', newTodo, state)
+      // state.value.context.todoList.push(newTodo) // add data to context todoList
       sweetalert('Success!', 'To-Do created!', 'success')
     }
 
@@ -62,9 +69,11 @@ export default {
       state,
       send,
       service,
-      todoList,
       createTodo,
-      ...todoActionStore
+      todoActionStore,
+      todoList,
+      todoList1,
+      todoList2
     }
   }
 }

@@ -3,24 +3,23 @@ const { assign } = actions
 
 const todoItemMachine = Machine({
   id: 'todoItem',
-  initial: 'addItem',
+  initial: 'completed',
   states: {
-    addItem: {}
+    todoListAcations: {},
+    completed: {},
+    pending: {}
   }
 })
 
-// const todoItemMachine = (todo) => {
-//   return Machine({
-//     id: 'todoItem',
-//     context: {
-//       todo
-//     },
-//     initial: 'addItem',
-//     states: {
-//       addItem: {}
-//     }
-//   })
-// }
+const createTodo = (data) => {
+  console.log('createTodo', data)
+  return {
+    title: data.title,
+    project: data.project,
+    done: false,
+    new: true
+  }
+}
 
 export const todoMachine = Machine(
   {
@@ -60,9 +59,7 @@ export const todoMachine = Machine(
       },
       list: {
         entry: 'fetchList',
-        on: {
-          listItems: 'todoItemActions'
-        }
+        always: 'todoItemActions'
       },
       resolved: {
         type: 'final'
@@ -80,7 +77,7 @@ export const todoMachine = Machine(
             states: {
               add_details: {
                 on: {
-                  fillDetails: [{ actions: 'createNewTodoItem' }]
+                  fillDetails: { actions: ['createNewTodoItem', 'persist'] }
                 }
               }
             }
@@ -90,7 +87,7 @@ export const todoMachine = Machine(
             states: {
               deleteItem: {
                 on: {
-                  delete: [{ actions: 'deleteSuccess' }]
+                  delete: [{ actions: 'deleteCurrentTodoItem' }]
                 }
               }
             }
@@ -100,7 +97,7 @@ export const todoMachine = Machine(
             states: {
               edit_details: {
                 on: {
-                  fill_details: [{ actions: 'editSuccess' }]
+                  fill_details: [{ actions: 'editCurrentTodoItem' }]
                 }
               }
             }
@@ -113,20 +110,29 @@ export const todoMachine = Machine(
     actions: {
       fetchList: assign({
         todoList: (context, event) => {
+          console.log('todoList fetchlist', context)
           return context.todoList.map((todo) => ({
             ...todo,
             ref: spawn(todoItemMachine.withContext(todo))
           }))
         }
       }),
-      createNewTodoItem: assign((context, event) => {
-        console.log('create New Todo item', context, event)
-        // context.todoList.push(event.payload)
+      createNewTodoItem: assign({
+        todoList: (context, event) => {
+          console.log('create New Todo item', context, event)
+          let newTodo = createTodo(event.payload)
+          console.log('payload data check', ...newTodo)
+          return context.todoList.push({
+            ...newTodo,
+            ref: spawn(todoItemMachine.withContext(newTodo))
+          })
+          // console.log('context after value push', context)
+        }
       }),
-      deleteTodoItem: assign((context, event) => {
+      deleteCurrentTodoItem: assign((context, event) => {
         console.log('deleteTodoItem action', context, event)
       }),
-      testFunc: assign((context, event) => {
+      editCurrentTodoItem: assign((context, event) => {
         console.log('testFunc', context, event)
       })
     }

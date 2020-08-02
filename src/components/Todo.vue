@@ -56,26 +56,40 @@
 </template>
 
 <script type="text/javascript">
+import { useService } from '@xstate/vue'
+import { store } from '../store/todoActions'
+import { ref } from '@vue/composition-api'
 export default {
   props: ['todo'],
-  data() {
-    return {
-      isEditing: false
-    }
-  },
-  methods: {
-    completeTodo(todo) {
-      console.log('complete todo', todo)
+  setup(props, context) {
+    console.log('ref', props.todo)
+    let isEditing = ref(false)
+    const { state, send } = useService(props.todo.ref)
+    console.log('todo Item state', state)
+
+    function completeTodo(todo) {
       this.$emit('complete-todo', todo)
-    },
-    deleteTodo(todo) {
+    }
+
+    function deleteTodo(todo) {
       this.$emit('delete-todo', todo)
-    },
-    showForm() {
+    }
+
+    function showForm() {
       this.isEditing = true
-    },
-    hideForm() {
+    }
+
+    function hideForm() {
       this.isEditing = false
+    }
+    return {
+      state,
+      send,
+      isEditing,
+      completeTodo,
+      deleteTodo,
+      showForm,
+      hideForm
     }
   }
 }

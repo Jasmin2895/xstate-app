@@ -32,20 +32,20 @@ import Todo from './Todo'
 import { useMachine } from '@xstate/vue'
 import { store } from '../store/todoActions'
 import { reactive, computed } from '@vue/composition-api'
-import { todoMachine } from '../xstate-todo'
+import { todoMachine } from '../xstate-todo/index'
 export default {
   props: ['todos'],
   components: {
     Todo
   },
   setup(props, context) {
-    const todoActionStore = reactive({
-      store
+    const presentState = reactive({
+      currentState: computed(() => store.state.currentState)
     })
-    // const presentState = reactive({store.state.value})
-    // console.log('presentState', presentState)
     const { state, send } = useMachine(todoMachine)
-    console.log('todolist app', store.state.currentState, state.value, send)
+    // updated State (todoItemActions) in state.value.value
+    // console.log('state list111111', state.value.value, store.state.currentState)
+    console.log('state list 22222222', presentState)
 
     function deleteTodo(todo) {
       swal({
@@ -77,7 +77,6 @@ export default {
     return {
       state,
       send,
-      ...todoActionStore,
       deleteTodo,
       completeTodo
     }

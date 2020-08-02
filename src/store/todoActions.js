@@ -10,10 +10,15 @@ export const store = new Vuex.Store({
   },
   mutations: {
     transitions(state, action) {
+      console.log('transitions', state, action)
       state.currentState = todoMachine.transition(
         state.currentState,
         action
       ).value
+    },
+    setState(state, nextState) {
+      console.log('setState', nextState)
+      state.currentState = nextState
     },
     services(state, payload) {
       console.log('services store', payload)
