@@ -29,34 +29,35 @@
 <script type="text/javascript">
 import swal from 'sweetalert'
 import Todo from './Todo'
-
 export default {
   props: ['todos'],
   components: {
     Todo
   },
-  methods: {
-    deleteTodo(todo) {
-      console.log('delete todo', todo)
-      // todoMachine.send({ type: 'delete', payload: todo })
+  setup(props, { emit }) {
+    function deleteTodo(todo) {
+      let currentItem = todo
       swal({
         title: 'Are you sure?',
         text: 'Once deleted, you will not be able to recover this todo item!',
         icon: 'warning',
         buttons: true,
         dangerMode: true
-      }).then((todo) => {
-        let todoIndex = this.todos.indexOf(todo)
-        this.todos.splice(todoIndex, 1)
+      }).then(() => {
+        emit('delete-todo', currentItem)
         swal('Poof! Your imaginary file has been deleted!', {
           icon: 'success'
         })
       })
-    },
-    completeTodo(todo) {
-      const todoIndex = this.todos.indexOf(todo)
-      this.todos[todoIndex].done = true
+    }
+    function completeTodo(todo) {
+      emit('complete-todo', todo)
       swal('Success!', 'To-Do completed!', 'success')
+    }
+
+    return {
+      deleteTodo,
+      completeTodo
     }
   }
 }

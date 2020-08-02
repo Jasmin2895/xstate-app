@@ -1,27 +1,28 @@
 import Vue from 'vue'
-import { interpret } from 'xstate'
+import { todoMachine } from './index'
+import { useMachine } from '@xstate/vue'
+import { reactive, computed } from '@vue/composition-api'
+import { store } from '../store/todoActions'
 
-export const generateVueMachine = (machine) => {
-  return new Vue({
-    created() {
-      this.service
-        .onTransition((state) => {
-          this.current = state
-          this.context = state.context
-        })
-        .start()
-    },
-    data() {
-      return {
-        current: machine.initialState,
-        context: machine.context,
-        service: interpret(machine)
-      }
-    },
-    methods: {
-      send(event) {
-        this.service.send(event)
-      }
-    }
+export default function stateMachineActions() {
+  const { state, send } = useMachine(todoMachine)
+
+  let todoActionStore = reactive({
+    store
   })
+
+  function setCurrentState(state) {
+    store.commit('setState', state)
+  }
+  function stateTransitions(action, payload) {
+    send({ type: action, payload })
+  }
+
+  return {
+    state,
+    stateTransitions,
+    todoActionStore,
+    setCurrentState,
+    todoList: computed(() => state.value.context.todoList)
+  }
 }

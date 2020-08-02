@@ -1,10 +1,36 @@
-import { Machine, actions } from 'xstate'
+import { Machine, actions, spawn } from 'xstate'
 const { assign } = actions
+
+const todoItemMachine = Machine({
+  id: 'todoItem',
+  initial: 'completed',
+  states: {
+    completed: {
+      on: {
+        completeTask: { actions: 'completedTodoAction' }
+      }
+    },
+    pending: {}
+  },
+  actions: {
+    completedTodoAction: assign((context, event) => {})
+  }
+})
+
+const createTodo = (data) => {
+  console.log('createTodo', data)
+  return {
+    title: data.title,
+    project: data.project,
+    done: false,
+    new: true
+  }
+}
 
 export const todoMachine = Machine(
   {
     id: 'Todo',
-    initial: 'idle',
+    initial: 'list',
     context: {
       user: null,
       todoList: [
@@ -38,22 +64,8 @@ export const todoMachine = Machine(
         }
       },
       list: {
-        invoke: {
-          id: 'fetchList',
-          src: (context, event) => {
-            console.log('fetchList', context, event)
-            return context.todoList
-          },
-          onDone: {
-            target: 'resolved'
-          },
-          onError: 'rejected'
-        },
-        on: {
-          listItems: {
-            target: 'todoItemActions'
-          }
-        }
+        entry: 'fetchList',
+        always: 'todoItemActions'
       },
       resolved: {
         type: 'final'
@@ -71,7 +83,7 @@ export const todoMachine = Machine(
             states: {
               add_details: {
                 on: {
-                  fillDetails: [{ actions: 'createNewTodoItem' }]
+                  fillDetails: { actions: ['createNewTodoItem', 'persist'] }
                 }
               }
             }
@@ -81,7 +93,7 @@ export const todoMachine = Machine(
             states: {
               deleteItem: {
                 on: {
-                  delete: [{ actions: 'deleteSuccess' }]
+                  delete: { actions: ['deleteCurrentTodoItem', 'persist'] }
                 }
               }
             }
@@ -91,7 +103,7 @@ export const todoMachine = Machine(
             states: {
               edit_details: {
                 on: {
-                  fill_details: [{ actions: 'editSuccess' }]
+                  editItem: { actions: ['editCurrentTodoItem', 'persist'] }
                 }
               }
             }
@@ -102,15 +114,39 @@ export const todoMachine = Machine(
   },
   {
     actions: {
-      createNewTodoItem: assign((context, event) => {
-        console.log('create New Todo item', context, event)
-        context.todoList.push(event.payload)
+      fetchList: assign({
+        todoList: (context, event) => {
+          return context.todoList.map((todo) => ({
+            ...todo,
+            ref: spawn(todoItemMachine.withContext(todo))
+          }))
+        }
       }),
-      deleteTodoItem: assign((context, event) => {
-        console.log('deleteTodoItem action', context, event)
+      createNewTodoItem: assign({
+        todoList: (context, event) => {
+          let newTodo = createTodo(event.payload)
+          return context.todoList.concat({
+            ...newTodo,
+            ref: spawn(todoItemMachine.withContext(newTodo))
+          })
+        }
       }),
-      testFunc: assign((context, event) => {
-        console.log('testFunc', context, event)
+
+      deleteCurrentTodoItem: assign({
+        todoList: (context, event) => {
+          return context.todoList.filter((todo) => {
+            if (todo.title !== event.payload.title) {
+              return true
+            }
+          })
+        }
+      }),
+      editCurrentTodoItem: assign({
+        todoList: (context, event) => {
+          let todoIndex = context.todoList.indexOf(event.payload)
+          context.todoList[todoIndex].done = true
+          return context.todoList
+        }
       })
     }
   }
