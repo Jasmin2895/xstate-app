@@ -19,7 +19,7 @@ import sweetalert from 'sweetalert'
 import TodoList from './components/TodoList'
 import CreateTodo from './components/CreateTodo'
 import { onMounted } from '@vue/composition-api'
-import stateMachineActions from './xstate-todo/generateVueMachine'
+import stateMachineActions from './xstate-todo/generateTodoStateMachine'
 
 export default {
   name: 'app',

@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import { todoMachine } from './index'
 import { useMachine } from '@xstate/vue'
 import { reactive, computed } from '@vue/composition-api'
