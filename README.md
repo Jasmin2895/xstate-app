@@ -1,6 +1,6 @@
 # xstate-app
 
-> A Todo List made using vue composition API and Xstate library
+> A Todo List created using vue composition API and Xstate library
 
 ## Build Setup
 
